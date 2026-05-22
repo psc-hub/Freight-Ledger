@@ -9,8 +9,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="FreightLedger"/>
 <meta name="description" content="Professional trucking management - trips, expenses, IFTA, invoices"/>
-<link rel="manifest" href="/manifest.json"/>
-<link rel="apple-touch-icon" href="/icon-512.svg"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-512.svg"/>
 <title>Freight Ledger</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap');
@@ -732,6 +732,9 @@ if(sess&&sess.on&&auth){
 } else {
   showForm('f-login');
 }
+  // ── SERVICE WORKER ────────────────────────────────
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+  
 </script>
 </body>
 </html>
