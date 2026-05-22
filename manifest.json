@@ -37,8 +37,8 @@
     {
       "name": "Log New Trip",
       "short_name": "New Trip",
-      "url": "index.html"
+      "url": "index.html",
+      "description": "Open Freight Ledger directly to log a new trip segment"
     }
   ]
 }
-
