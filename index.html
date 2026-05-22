@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en" id="html-root">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" id="theme-meta" content="#f97316"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="FreightLedger"/>
+<meta name="description" content="Professional trucking management - trips, expenses, IFTA, invoices"/>
+<link rel="manifest" href="./manifest.json"/>
+<link rel="apple-touch-icon" href="./icon-512.svg"/>
+<title>Freight Ledger</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --pri:#f97316;--pri-d:#ea580c;--pri-l:#fff7ed;--pri-t:rgba(249,115,22,.12);
+  --bg:#ffffff;--bg2:#f9fafb;--bg3:#f3f4f6;--brd:#e5e7eb;
+  --txt:#111827;--txt2:#374151;--mut:#6b7280;
+  --grn:#10b981;--grn-t:rgba(16,185,129,.12);
+  --red:#ef4444;--red-t:rgba(239,68,68,.12);
+  --blu:#3b82f6;--blu-t:rgba(59,130,246,.12);
+  --pur:#8b5cf6;--pur-t:rgba(139,92,246,.12);
+  --nav:64px;--fh:'Barlow Condensed',sans-serif;--fb:'Inter',sans-serif;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.1),0 2px 6px rgba(0,0,0,.06);
+}
+.dark{
+  --bg:#0f1117;--bg2:#181c27;--bg3:#1e2333;--brd:#2a3045;
+  --txt:#e8eaf0;--txt2:#c4c9d8;--mut:#8892aa;
+  --pri-l:rgba(249,115,22,.12);--pri-t:rgba(249,115,22,.2);
+  --grn-t:rgba(16,185,129,.18);--red-t:rgba(239,68,68,.18);
+  --blu-t:rgba(59,130,246,.18);--pur-t:rgba(139,92,246,.18);
+  --sh:0 1px 3px rgba(0,0,0,.3);--sh2:0 4px 16px rgba(0,0,0,.35);
+}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:var(--fb);overflow:hidden;transition:background .2s,color .2s;}
+/* AUTH */
+#auth{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;overflow-y:auto;}
+#auth.hide{display:none;}
+.a-hero{background:linear-gradient(150deg,#f97316 0%,#ea580c 60%,#c2410c 100%);padding:56px 24px 48px;display:flex;flex-direction:column;align-items:center;color:#fff;position:relative;overflow:hidden;}
+.a-hero::after{content:'';position:absolute;right:-40px;bottom:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.08);}
+.a-hero::before{content:'';position:absolute;left:-30px;top:20px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.06);}
+.a-logo{font-family:var(--fh);font-size:38px;font-weight:800;letter-spacing:1px;margin-bottom:6px;position:relative;z-index:1;}
+.a-logo span{opacity:.7;font-weight:600;}
+.a-tag{font-size:13px;opacity:.85;font-weight:500;letter-spacing:.5px;position:relative;z-index:1;}
+.a-card{background:var(--bg);border-radius:20px 20px 0 0;margin-top:-16px;padding:28px 20px 40px;flex:1;position:relative;z-index:2;box-shadow:0 -4px 20px rgba(0,0,0,.08);}
+.a-title{font-family:var(--fh);font-size:24px;font-weight:800;color:var(--txt);margin-bottom:20px;}
+.a-err{background:var(--red-t);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px 13px;font-size:13px;color:var(--red);margin-bottom:14px;display:none;}
+.a-err.show{display:block;}
+.a-sw{text-align:center;margin-top:18px;font-size:13px;color:var(--mut);}
+.a-sw a{color:var(--pri);font-weight:600;cursor:pointer;}
+.a-form{display:none;}
+.a-form.show{display:block;}
+/* APP */
+#app{display:none;flex-direction:column;height:100%;max-width:480px;margin:0 auto;}
+#app.show{display:flex;}
+#hdr{background:var(--bg);border-bottom:1px solid var(--brd);padding:0 16px;display:flex;align-items:center;gap:10px;height:56px;flex-shrink:0;box-shadow:var(--sh);}
+.logo{font-family:var(--fh);font-size:21px;font-weight:800;color:var(--pri);letter-spacing:.5px;line-height:1.1;}
+.logo-co{font-size:10px;font-weight:500;color:var(--mut);letter-spacing:.3px;display:block;}
+#sync-badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;border:1px solid rgba(16,185,129,.3);background:var(--grn-t);color:var(--grn);display:none;}
+#sync-badge.show{display:inline-block;}
+#sync-badge.err{border-color:rgba(239,68,68,.3);background:var(--red-t);color:var(--red);}
+#profit-pill{margin-left:auto;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid rgba(16,185,129,.3);background:var(--grn-t);color:var(--grn);white-space:nowrap;}
+#content{flex:1;overflow-y:auto;padding:14px 14px calc(var(--nav)+20px);-webkit-overflow-scrolling:touch;}
+#content::-webkit-scrollbar{display:none;}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg);border-top:1px solid var(--brd);display:flex;height:var(--nav);z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,.06);}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--mut);cursor:pointer;font-size:9px;font-weight:600;font-family:var(--fb);letter-spacing:.3px;text-transform:uppercase;transition:color .15s;}
+.nb.on{color:var(--pri);}
+/* CARDS */
+.card{background:var(--bg);border:1px solid var(--brd);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--sh);}
+.dark .card{background:var(--bg2);}
+.ct{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--pri);margin-bottom:10px;}
+.row{display:flex;justify-content:space-between;align-items:center;}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.stat{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:13px;box-shadow:var(--sh);}
+.dark .stat{background:var(--bg3);}
+.sv{font-family:var(--fh);font-size:24px;font-weight:700;line-height:1;}
+.sl{font-size:10px;color:var(--mut);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.ca .sv{color:var(--pri);}
+.cg .sv{color:var(--grn);}
+.cr .sv{color:var(--red);}
+.cb .sv{color:var(--blu);}
+.cp .sv{color:var(--pur);}
+/* LIST */
+.li{background:var(--bg);border:1px solid var(--brd);border-radius:12px;padding:13px;margin-bottom:8px;cursor:pointer;box-shadow:var(--sh);transition:border-color .15s,box-shadow .15s;}
+.dark .li{background:var(--bg2);}
+.li:active{border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-t);}
+.li-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;}
+.li-t{font-size:14px;font-weight:600;flex:1;padding-right:8px;line-height:1.3;color:var(--txt);}
+.li-a{font-family:var(--fh);font-size:16px;font-weight:700;}
+.cg{color:var(--grn)!important;}
+.cr{color:var(--red)!important;}
+.ca{color:var(--pri)!important;}
+.cb{color:var(--blu)!important;}
+.cp{color:var(--pur)!important;}
+.li-s{font-size:11px;color:var(--mut);line-height:1.6;margin-top:2px;}
+.tags{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;}
+.tag{background:var(--bg3);border:1px solid var(--brd);border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;color:var(--mut);}
+.tag.a{background:var(--pri-t);border-color:rgba(249,115,22,.3);color:var(--pri);}
+.tag.g{background:var(--grn-t);border-color:rgba(16,185,129,.3);color:var(--grn);}
+.tag.b{background:var(--blu-t);border-color:rgba(59,130,246,.3);color:var(--blu);}
+.tag.p{background:var(--pur-t);border-color:rgba(139,92,246,.3);color:var(--pur);}
+/* FAB */
+.fab{position:fixed;bottom:calc(var(--nav)+14px);right:16px;width:52px;height:52px;border-radius:50%;background:var(--pri);border:none;cursor:pointer;font-size:28px;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(249,115,22,.45);z-index:90;}
+.fab:active{transform:scale(.9);}
+/* FORMS */
+.fg{margin-bottom:13px;}
+label{display:block;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);margin-bottom:5px;}
+input,select,textarea{width:100%;background:var(--bg3);border:1.5px solid var(--brd);border-radius:10px;padding:11px 13px;color:var(--txt);font-family:var(--fb);font-size:14px;outline:none;-webkit-appearance:none;appearance:none;transition:border-color .15s,box-shadow .15s;}
+input:focus,select:focus,textarea:focus{border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-t);}
+input::placeholder,textarea::placeholder{color:var(--mut);font-size:13px;}
+select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%236b7280'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;}
+textarea{resize:none;min-height:64px;}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+/* BUTTONS */
+.btn{display:block;width:100%;padding:13px;border-radius:10px;border:none;font-family:var(--fb);font-size:15px;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;transition:opacity .15s,transform .1s;}
+.btn:active{opacity:.85;transform:scale(.99);}
+.bta{background:var(--pri);color:#fff;}
+.btr{background:var(--red);color:#fff;margin-top:8px;}
+.bto{background:transparent;border:1.5px solid var(--brd);color:var(--mut);margin-top:8px;}
+.btg{background:var(--grn);color:#fff;}
+.bts{display:inline-block;width:auto;padding:8px 14px;font-size:13px;border-radius:8px;}
+.badge{display:inline-block;background:var(--pri);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.4px;text-transform:uppercase;}
+.badge.g{background:var(--grn);}
+.div{height:1px;background:var(--brd);margin:14px 0;}
+/* EMPTY */
+.empty{text-align:center;padding:44px 20px;color:var(--mut);}
+.ei{font-size:50px;margin-bottom:12px;opacity:.5;}
+.et{font-size:18px;font-weight:700;margin-bottom:6px;color:var(--txt);}
+/* SHEET */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:flex-end;display:none;}
+.overlay.open{display:flex;}
+.sheet{background:var(--bg);border-radius:20px 20px 0 0;padding:18px 16px 48px;width:100%;max-width:480px;margin:0 auto;max-height:93vh;overflow-y:auto;}
+.dark .sheet{background:var(--bg2);}
+.sh{width:36px;height:4px;background:var(--brd);border-radius:2px;margin:0 auto 16px;}
+.st{font-family:var(--fh);font-size:22px;font-weight:800;margin-bottom:16px;color:var(--txt);}
+.back{background:none;border:none;color:var(--mut);cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;font-family:var(--fb);font-weight:600;padding:4px 0;margin-bottom:14px;}
+/* ADDRESS */
+.addr-wrap{position:relative;}
+.addr-drop{position:absolute;top:100%;left:0;right:0;background:var(--bg);border:1.5px solid var(--pri);border-top:none;border-radius:0 0 10px 10px;z-index:600;max-height:180px;overflow-y:auto;display:none;box-shadow:var(--sh2);}
+.dark .addr-drop{background:var(--bg2);}
+.addr-drop.open{display:block;}
+.ai{padding:10px 13px;font-size:12px;border-bottom:1px solid var(--brd);cursor:pointer;color:var(--txt);line-height:1.4;}
+.ai:active{background:var(--bg3);}
+/* STOPS */
+.stop-c{background:var(--bg2);border:1.5px solid var(--brd);border-radius:12px;padding:12px;margin-bottom:8px;}
+.dark .stop-c{background:var(--bg3);}
+/* TOGGLE */
+.tg{display:flex;border:1.5px solid var(--brd);border-radius:10px;overflow:hidden;margin-bottom:12px;}
+.tgb{flex:1;padding:10px;border:none;background:transparent;color:var(--mut);font-family:var(--fb);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,color .15s;}
+.tgb.on{background:var(--pri);color:#fff;}
+/* SWITCH */
+.sw{width:42px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s;}
+.sw::after{content:'';position:absolute;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.sw.off{background:var(--brd);}
+.sw.off::after{left:3px;}
+.sw.on{background:var(--pri);}
+.sw.on::after{left:21px;}
+/* REV BOX */
+.rev-box{background:var(--pri-l);border:1.5px solid rgba(249,115,22,.25);border-radius:12px;padding:14px;margin-bottom:14px;}
+.rr{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;align-items:center;}
+.rr:last-child{margin-bottom:0;padding-top:8px;border-top:1px solid rgba(249,115,22,.2);}
+.rt{font-family:var(--fh);font-size:22px;font-weight:800;color:var(--pri);}
+/* PILLS */
+.cpills{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px;}
+.cpills::-webkit-scrollbar{display:none;}
+.cpill{background:var(--bg3);border:1.5px solid var(--brd);border-radius:20px;padding:5px 13px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--mut);transition:all .15s;}
+.cpill.on{background:var(--pri);color:#fff;border-color:var(--pri);}
+/* IFTA TABLE */
+.itable{width:100%;border-collapse:collapse;font-size:12px;}
+.itable th{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);text-align:left;padding:6px 8px;border-bottom:1.5px solid var(--brd);font-weight:600;}
+.itable td{padding:8px;border-bottom:1px solid var(--brd);}
+.itable tr:last-child td{border-bottom:none;}
+.pbar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:8px;}
+.pfill{height:100%;border-radius:3px;}
+/* INVOICE */
+.inv-total{background:var(--grn-t);border:1px solid rgba(16,185,129,.25);border-radius:12px;padding:14px;margin-top:12px;}
+.inv-lbl{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;}
+.inv-val{font-family:var(--fh);font-size:30px;font-weight:800;color:var(--grn);}
+/* TOAST */
+#toast{position:fixed;top:66px;left:50%;transform:translateX(-50%);background:var(--txt);color:var(--bg);padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;white-space:nowrap;display:none;box-shadow:var(--sh2);}
+#toast.err{background:var(--red);color:#fff;}
+/* MISC */
+.stitle{font-size:16px;font-weight:700;margin-bottom:10px;color:var(--txt);}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--brd);}
+.srow:last-child{border-bottom:none;}
+.srow-l{font-size:14px;font-weight:500;color:var(--txt);}
+.srow-s{font-size:11px;color:var(--mut);margin-top:2px;}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--brd);border-top-color:var(--pri);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.dv{font-size:14px;font-weight:600;color:var(--txt);}
+.sec{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.sec-bar{width:3px;height:18px;background:var(--pri);border-radius:2px;}
+.fb-banner{background:var(--pri-t);border:1px solid rgba(249,115,22,.25);border-radius:10px;padding:10px 13px;font-size:12px;color:var(--txt2);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.fu{animation:fadeUp .2s ease both;}
+</style>
+</head>
+<body>
+<!-- AUTH -->
+<div id="auth">
+  <div class="a-hero">
+    <div style="font-size:48px;margin-bottom:8px;position:relative;z-index:1;">🚛</div>
+    <div class="a-logo">FREIGHT<span>LEDGER</span></div>
+    <div class="a-tag">Professional Trucking Management</div>
+  </div>
+  <div class="a-card">
+    <!-- Login -->
+    <div class="a-form show" id="f-login">
+      <div class="a-title">Welcome Back</div>
+      <div class="a-err" id="l-err"></div>
+      <div class="fg"><label>Email</label><input id="l-email" type="email" placeholder="you@example.com" autocomplete="email"/></div>
+      <div class="fg"><label>Password</label><input id="l-pwd" type="password" placeholder="Your password" autocomplete="current-password"/></div>
+      <button class="btn bta" onclick="doLogin()">Sign In</button>
+      <div class="a-sw">New here? <a onclick="showForm('f-reg')">Create Account</a></div>
+    </div>
+    <!-- Register -->
+    <div class="a-form" id="f-reg">
+      <div class="a-title">Create Account</div>
+      <div class="a-err" id="r-err"></div>
+      <div class="fg"><label>Email</label><input id="r-email" type="email" placeholder="you@example.com" autocomplete="email"/></div>
+      <div class="fg"><label>Password</label><input id="r-pwd" type="password" placeholder="Min 8 characters" autocomplete="new-password"/></div>
+      <div class="fg"><label>Confirm Password</label><input id="r-cpwd" type="password" placeholder="Repeat password"/></div>
+      <button class="btn bta" onclick="doRegister()">Create Account</button>
+      <div class="a-sw">Already have an account? <a onclick="showForm('f-login')">Sign In</a></div>
+    </div>
+    <!-- 2FA -->
+    <div class="a-form" id="f-tfa">
+      <div style="text-align:center;font-size:44px;margin-bottom:8px">🔐</div>
+      <div class="a-title" style="text-align:center">Enter Code</div>
+      <p style="font-size:13px;color:var(--mut);text-align:center;margin-bottom:16px;line-height:1.5">Enter the 6-digit code from your authenticator app</p>
+      <div class="a-err" id="t-err"></div>
+      <div class="fg"><label>Authenticator Code</label><input id="t-code" type="number" placeholder="000000" style="text-align:center;font-size:26px;letter-spacing:8px;font-weight:700"/></div>
+      <button class="btn bta" onclick="doVerifyTFA()">Verify</button>
+      <div class="a-sw"><a onclick="showForm('f-login')">Back to Login</a></div>
+    </div>
+  </div>
+</div>
+<!-- APP -->
+<div id="app">
+  <div id="hdr">
+    <div>
+      <div class="logo">FREIGHT<span style="color:var(--mut);font-weight:600">LEDGER</span></div>
+      <span class="logo-co" id="co-lbl"></span>
+    </div>
+    <span id="sync-badge">☁ Synced</span>
+    <div id="profit-pill">$0.00</div>
+  </div>
+  <div id="content"></div>
+  <nav>
+    <button class="nb on" id="nb-dash" onclick="go('dash')"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Home</button>
+    <button class="nb" id="nb-trips" onclick="go('trips')"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9 1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Trips</button>
+    <button class="nb" id="nb-exp" onclick="go('exp')"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Expenses</button>
+    <button class="nb" id="nb-ifta" onclick="go('ifta')"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>IFTA</button>
+    <button class="nb" id="nb-inv" onclick="go('inv')"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>Invoice</button>
+    <button class="nb" id="nb-set" onclick="go('set')"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>Settings</button>
+  </nav>
+</div>
+<!-- SHEET -->
+<div id="overlay" class="overlay" onclick="closeSheet(event)">
+  <div class="sheet" id="sheet"><div class="sh"></div><div class="st" id="s-title"></div><div id="s-body"></div></div>
+</div>
+<div id="toast"></div>
+<script>
+// ── HELPERS ──────────────────────────────────────
+var uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+var f$=n=>'$'+(+n||0).toFixed(2);
+var fD=d=>{if(!d)return'—';var p=d.split('-');return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'});};
+var today=()=>new Date().toISOString().split('T')[0];
+var esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+var clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
+function toast(msg,err){var t=document.getElementById('toast');t.textContent=msg;t.className=err?'err':'';t.style.display='block';setTimeout(()=>t.style.display='none',2600);}
+
+// ── STATE ─────────────────────────────────────────
+var DB={
+  trips:JSON.parse(localStorage.getItem('fl_trips')||'[]'),
+  expenses:JSON.parse(localStorage.getItem('fl_exp')||'[]'),
+  invoices:JSON.parse(localStorage.getItem('fl_inv')||'[]'),
+  settings:JSON.parse(localStorage.getItem('fl_set')||'{}'),
+  auth:JSON.parse(localStorage.getItem('fl_auth')||'null'),
+  sess:JSON.parse(localStorage.getItem('fl_sess')||'{"on":false}')
+};
+var trips=DB.trips,expenses=DB.expenses,invoices=DB.invoices,settings=DB.settings,auth=DB.auth,sess=DB.sess;
+var tab='dash',viewTrip=null,viewInv=null,editTrip=null,expCat='all';
+var tstops=[],rateType='per_mile',commOn=false,commType='percent',addrT={},tfaSecret='';
+var fbReady=false,fbDB=null,currentUser=null;
+
+function saveLocal(){
+  localStorage.setItem('fl_trips',JSON.stringify(trips));
+  localStorage.setItem('fl_exp',JSON.stringify(expenses));
+  localStorage.setItem('fl_inv',JSON.stringify(invoices));
+  localStorage.setItem('fl_set',JSON.stringify(settings));
+}
+
+// ── FIREBASE ─────────────────────────────────────
+// Firebase config - user fills in Settings if they want cloud sync
+function initFirebase(cfg){
+  if(!cfg||!cfg.apiKey){return;}
+  try{
+    if(typeof firebase==='undefined'){
+      // Load Firebase dynamically
+      var scripts=['https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js','https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js','https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js'];
+      var loaded=0;
+      scripts.forEach(src=>{
+        var s=document.createElement('script');
+        s.src=src;
+        s.onload=()=>{loaded++;if(loaded===scripts.length)connectFirebase(cfg);};
+        document.head.appendChild(s);
+      });
+    } else {connectFirebase(cfg);}
+  }catch(e){console.warn('Firebase init error',e);}
+}
+
+function connectFirebase(cfg){
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(cfg);
+    fbDB=firebase.firestore();
+    fbReady=true;
+    setSyncBadge('☁ Connected','ok');
+    syncFromCloud();
+  }catch(e){setSyncBadge('☁ Offline','err');console.warn(e);}
+}
+
+function setSyncBadge(txt,state){
+  var b=document.getElementById('sync-badge');
+  if(!b)return;
+  b.textContent=txt;
+  b.className=state==='err'?'show err':'show';
+}
+
+async function syncToCloud(){
+  if(!fbReady||!fbDB||!auth)return;
+  try{
+    var uid2=btoa(auth.email).replace(/=/g,'');
+    var ref=fbDB.collection('users').doc(uid2);
+    await ref.set({trips,expenses,invoices,settings,updatedAt:new Date().toISOString()});
+    setSyncBadge('☁ Synced','ok');
+  }catch(e){setSyncBadge('☁ Sync Error','err');}
+}
+
+async function syncFromCloud(){
+  if(!fbReady||!fbDB||!auth)return;
+  try{
+    var uid2=btoa(auth.email).replace(/=/g,'');
+    var doc=await fbDB.collection('users').doc(uid2).get();
+    if(doc.exists){
+      var d=doc.data();
+      if(d.trips)trips=d.trips;
+      if(d.expenses)expenses=d.expenses;
+      if(d.invoices)invoices=d.invoices;
+      if(d.settings){settings=Object.assign({},settings,d.settings);}
+      saveLocal();
+      render();
+      setSyncBadge('☁ Synced','ok');
+    }
+  }catch(e){setSyncBadge('☁ Offline','err');}
+}
+
+function saveAll(){
+  saveLocal();
+  syncToCloud();
+}
+
+// ── CRYPTO / TOTP ─────────────────────────────────
+function b32dec(s){var a='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';s=s.toUpperCase().replace(/=+$/,'');var b=0,v=0,o=[];for(var i=0;i<s.length;i++){var ix=a.indexOf(s[i]);if(ix<0)continue;v=(v<<5)|ix;b+=5;if(b>=8){o.push((v>>>(b-8))&255);b-=8;}}return new Uint8Array(o);}
+async function sha256(str){var e=new TextEncoder();var b=await crypto.subtle.digest('SHA-256',e.encode(str));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+function genSecret(){var a='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';var b=crypto.getRandomValues(new Uint8Array(20));return Array.from(b).map(x=>a[x%32]).join('');}
+async function totpNow(secret,delta){var key=b32dec(secret);var ctr=Math.floor(Date.now()/1000/30)+(delta||0);var buf=new ArrayBuffer(8);new DataView(buf).setUint32(4,ctr,false);var ck=await crypto.subtle.importKey('raw',key,{name:'HMAC',hash:'SHA-1'},false,['sign']);var sig=new Uint8Array(await crypto.subtle.sign('HMAC',ck,buf));var off=sig[19]&0xf;var code=((sig[off]&0x7f)<<24|sig[off+1]<<16|sig[off+2]<<8|sig[off+3])%1000000;return String(code).padStart(6,'0');}
+async function verifyTOTP(secret,code){for(var d=-1;d<=1;d++){if(await totpNow(secret,d)===String(code).trim())return true;}return false;}
+
+// ── AUTH ──────────────────────────────────────────
+function showForm(id){document.querySelectorAll('.a-form').forEach(f=>f.className='a-form');document.getElementById(id).className='a-form show';}
+function setErr(id,msg){var e=document.getElementById(id);e.textContent=msg;e.className='a-err show';}
+
+async function doLogin(){
+  setErr('l-err','');
+  var email=(document.getElementById('l-email')||{}).value.trim();
+  var pwd=(document.getElementById('l-pwd')||{}).value;
+  if(!email||!pwd){setErr('l-err','Please fill in all fields.');return;}
+  if(!auth||auth.email!==email){setErr('l-err','No account found with this email.');return;}
+  if(await sha256(pwd)!==auth.pwdHash){setErr('l-err','Incorrect password.');return;}
+  if(auth.tfaEnabled&&auth.tfaSecret){showForm('f-tfa');return;}
+  startSession();
+}
+
+async function doRegister(){
+  setErr('r-err','');
+  var email=(document.getElementById('r-email')||{}).value.trim();
+  var pwd=(document.getElementById('r-pwd')||{}).value;
+  var cpwd=(document.getElementById('r-cpwd')||{}).value;
+  if(!email||!pwd||!cpwd){setErr('r-err','Please fill in all fields.');return;}
+  if(pwd!==cpwd){setErr('r-err','Passwords do not match.');return;}
+  if(pwd.length<8){setErr('r-err','Password must be at least 8 characters.');return;}
+  auth={email,pwdHash:await sha256(pwd),tfaEnabled:false,tfaSecret:null};
+  localStorage.setItem('fl_auth',JSON.stringify(auth));
+  startSession();
+}
+
+async function doVerifyTFA(){
+  setErr('t-err','');
+  var code=(document.getElementById('t-code')||{}).value.trim();
+  if(!code||code.length<6){setErr('t-err','Enter your 6-digit code.');return;}
+  if(!await verifyTOTP(auth.tfaSecret,code)){setErr('t-err','Invalid code. Check your authenticator app.');return;}
+  startSession();
+}
+
+function startSession(){
+  sess={on:true};localStorage.setItem('fl_sess',JSON.stringify(sess));
+  document.getElementById('auth').className='hide';
+  document.getElementById('app').className='show';
+  applyTheme();
+  if(settings.fbConfig)initFirebase(settings.fbConfig);
+  go('dash');
+}
+
+function doLogout(){
+  sess={on:false};localStorage.setItem('fl_sess',JSON.stringify(sess));
+  viewTrip=null;viewInv=null;
+  document.getElementById('app').className='';
+  document.getElementById('auth').className='';
+  showForm('f-login');
+}
+
+function applyTheme(){
+  var r=document.getElementById('html-root');
+  if(r)r.className=settings.dark?'dark':'';
+  var m=document.getElementById('theme-meta');
+  if(m)m.content='#f97316';
+}
+
+// ── NAV ───────────────────────────────────────────
+function go(t){tab=t;viewTrip=null;viewInv=null;['dash','trips','exp','ifta','inv','set'].forEach(id=>{var b=document.getElementById('nb-'+id);if(b)b.className='nb'+(id===t?' on':'');});render();}
+
+function render(){
+  updateHdr();
+  var c=document.getElementById('content');
+  if(!c)return;
+  if(tab==='dash')c.innerHTML=rdash();
+  else if(tab==='trips')c.innerHTML=viewTrip?rTripDetail(viewTrip):rTrips();
+  else if(tab==='exp')c.innerHTML=rExp();
+  else if(tab==='ifta')c.innerHTML=rIFTA();
+  else if(tab==='inv')c.innerHTML=viewInv?rInvDetail(viewInv):rInv();
+  else if(tab==='set')c.innerHTML=rSet();
+}
+
+function updateHdr(){
+  var net=trips.reduce((s,t)=>s+(+t.net||+t.gross||0),0);
+  var exp2=expenses.reduce((s,e)=>s+(+e.amount||0),0);
+  var profit=net-exp2;
+  var p=document.getElementById('profit-pill');
+  if(p){p.textContent=f$(Math.abs(profit));var pos=profit>=0;p.style.color=pos?'var(--grn)':'var(--red)';p.style.borderColor=pos?'rgba(16,185,129,.3)':'rgba(239,68,68,.3)';p.style.background=pos?'var(--grn-t)':'var(--red-t)';}
+  var co=document.getElementById('co-lbl');if(co)co.textContent=settings.company||'';
+}
+
+function openSheet(title,html){document.getElementById('s-title').textContent=title;document.getElementById('s-body').innerHTML=html;document.getElementById('overlay').className='overlay open';setTimeout(()=>renderStops(),60);}
+function closeSheet(e){if(!e||e.target===document.getElementById('overlay')){document.getElementById('overlay').className='overlay';document.getElementById('s-body').innerHTML='';}}
+
+// ── SHARED ────────────────────────────────────────
+var EXP_CATS=['Fuel','Tolls','Maintenance','Insurance','Permits','Lumper','Scale','Food','Lodging','Trailer Rental','Other'];
+var US_STATES=['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','ON','QC','BC','AB','MB','SK'];
+var SM={'Alabama':'AL','Alaska':'AK','Arizona':'AZ','Arkansas':'AR','California':'CA','Colorado':'CO','Connecticut':'CT','Delaware':'DE','Florida':'FL','Georgia':'GA','Hawaii':'HI','Idaho':'ID','Illinois':'IL','Indiana':'IN','Iowa':'IA','Kansas':'KS','Kentucky':'KY','Louisiana':'LA','Maine':'ME','Maryland':'MD','Massachusetts':'MA','Michigan':'MI','Minnesota':'MN','Mississippi':'MS','Missouri':'MO','Montana':'MT','Nebraska':'NE','Nevada':'NV','New Hampshire':'NH','New Jersey':'NJ','New Mexico':'NM','New York':'NY','North Carolina':'NC','North Dakota':'ND','Ohio':'OH','Oklahoma':'OK','Oregon':'OR','Pennsylvania':'PA','Rhode Island':'RI','South Carolina':'SC','South Dakota':'SD','Tennessee':'TN','Texas':'TX','Utah':'UT','Vermont':'VT','Virginia':'VA','Washington':'WA','West Virginia':'WV','Wisconsin':'WI','Wyoming':'WY','Ontario':'ON','Quebec':'QC','British Columbia':'BC','Alberta':'AB','Manitoba':'MB','Saskatchewan':'SK'};
+function stat(cls,lbl,val){return '<div class="stat '+cls+'"><div class="sv">'+val+'</div><div class="sl">'+lbl+'</div></div>';}
+function dr(l,v){return '<div class="row" style="margin-bottom:9px"><span style="font-size:13px;color:var(--mut);font-weight:500">'+l+'</span>'+v+'</div>';}
+function oName(t){return(t.stops&&t.stops[0])?t.stops[0].addr.split(',')[0]:'Origin';}
+function dName(t){return(t.stops&&t.stops[t.stops.length-1])?t.stops[t.stops.length-1].addr.split(',')[0]:'Dest';}
+
+// ── DASHBOARD ─────────────────────────────────────
+function rdash(){
+  var rev=trips.reduce((s,t)=>s+(+t.gross||0),0);
+  var net=trips.reduce((s,t)=>s+(+t.net||+t.gross||0),0);
+  var exp2=expenses.reduce((s,e)=>s+(+e.amount||0),0);
+  var mi=trips.reduce((s,t)=>s+(+t.miles||0),0);
+  var profit=net-exp2;
+  var rpm=mi?(net/mi).toFixed(2):'0.00';
+  var cpm=mi?(exp2/mi).toFixed(2):'0.00';
+  var margin=rev?((profit/rev)*100).toFixed(1):'0.0';
+  var h='<div class="fu"><div class="stats">'+stat('cg','Net Revenue',f$(net))+stat('cr','Expenses',f$(exp2))+stat(profit>=0?'ca':'cr',profit>=0?'Profit':'Loss',f$(Math.abs(profit)))+stat('cb','Total Miles',Math.round(mi).toLocaleString())+'</div>';
+  h+='<div class="card"><div class="ct">Performance</div>'+dr('Revenue / mile','<span class="cg dv">$'+rpm+'</span>')+dr('Expense / mile','<span class="cr dv">$'+cpm+'</span>')+dr('Profit margin','<span style="color:'+(profit>=0?'var(--grn)':'var(--red)')+'" class="dv">'+margin+'%</span>');
+  if(rev>0){var pct=clamp(parseFloat(margin),0,100);h+='<div class="pbar"><div class="pfill" style="width:'+pct+'%;background:'+(profit>=0?'var(--grn)':'var(--red)')+'"></div></div><div style="font-size:10px;color:var(--mut);margin-top:4px;text-align:right">Profit Margin</div>';}
+  h+='</div>';
+  var rt=trips.slice().sort((a,b)=>b.date>a.date?1:-1).slice(0,4);
+  var re=expenses.slice().sort((a,b)=>b.date>a.date?1:-1).slice(0,3);
+  if(rt.length){h+='<div class="sec"><div class="sec-bar"></div><div class="stitle" style="margin-bottom:0">Recent Trips</div></div>';rt.forEach(t=>{h+='<div class="li"><div class="li-top"><span class="li-t">'+esc(oName(t))+' → '+esc(dName(t))+'</span><span class="li-a cg">'+f$(+t.net||+t.gross||0)+'</span></div><div class="li-s">'+fD(t.date)+(t.miles?' · '+Math.round(+t.miles).toLocaleString()+' mi':'')+'</div></div>';});}
+  if(re.length){h+='<div class="sec" style="margin-top:4px"><div class="sec-bar"></div><div class="stitle" style="margin-bottom:0">Recent Expenses</div></div>';re.forEach(e=>{h+='<div class="li"><div class="li-top"><span class="li-t">'+esc(e.cat)+'</span><span class="li-a cr">-'+f$(e.amount)+'</span></div><div class="li-s">'+fD(e.date)+(e.vendor?' · '+esc(e.vendor):'')+'</div></div>';});}
+  if(!trips.length&&!expenses.length)h+='<div class="empty"><div class="ei">🚛</div><div class="et">Welcome to Freight Ledger</div><p>Log your first trip or expense below</p></div>';
+  h+='</div>';
+  return h;
+}
+
+// ── TRIPS ─────────────────────────────────────────
+function rTrips(){
+  var s=trips.slice().sort((a,b)=>b.date>a.date?1:-1);
+  var h='<div class="fu">';
+  if(!s.length)h+='<div class="empty"><div class="ei">🚛</div><div class="et">No trips yet</div><p>Tap + to log your first load</p></div>';
+  s.forEach(t=>{
+    var drops=(t.stops||[]).filter(s=>s.type==='delivery').length;
+    h+='<div class="li" onclick="doViewTrip(\''+t.id+'\')"><div class="li-top"><span class="li-t">'+esc(oName(t))+' → '+esc(dName(t))+'</span><span class="li-a cg">'+f$(+t.net||+t.gross||0)+'</span></div><div class="li-s">'+fD(t.date)+(t.miles?' · '+Math.round(+t.miles).toLocaleString()+' mi':'')+(t.broker?' · '+esc(t.broker):'')+'</div><div class="tags">';
+    if(t.load)h+='<span class="tag">Load #'+esc(t.load)+'</span>';
+    if(drops>1)h+='<span class="tag b">'+drops+' drops</span>';
+    if(t.mbs&&Object.keys(t.mbs).length)h+='<span class="tag a">IFTA ✓</span>';
+    if(+t.comm>0)h+='<span class="tag p">Comm '+f$(t.comm)+'</span>';
+    h+='</div></div>';
+  });
+  h+='</div><button class="fab" onclick="openTripForm()">+</button>';
+  return h;
+}
+function doViewTrip(id){viewTrip=trips.find(t=>t.id===id);render();}
+function rTripDetail(t){
+  var te=expenses.filter(e=>e.tripId===t.id);
+  var teTot=te.reduce((s,e)=>s+(+e.amount||0),0);
+  var h='<div class="fu"><button class="back" onclick="viewTrip=null;render()">← Trips</button>';
+  h+='<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px"><div><div class="ct">Trip Detail</div><div style="font-size:18px;font-weight:700;color:var(--txt);line-height:1.2">'+esc(oName(t))+' → '+esc(dName(t))+'</div></div>';
+  h+='<div style="display:flex;gap:6px"><button onclick="doEditTrip(\''+t.id+'\')" style="background:var(--bg3);border:1.5px solid var(--brd);border-radius:8px;padding:7px 11px;cursor:pointer;font-size:14px">✏️</button><button onclick="doDeleteTrip(\''+t.id+'\')" style="background:var(--red-t);border:1.5px solid rgba(239,68,68,.3);border-radius:8px;padding:7px 11px;cursor:pointer;font-size:14px">🗑</button></div></div>';
+  h+='<div style="font-family:var(--fh);font-size:32px;font-weight:800;color:var(--grn);margin-bottom:14px">'+f$(+t.net||+t.gross||0)+'<span style="font-size:13px;color:var(--mut);font-weight:400;margin-left:6px">net</span></div>';
+  [['Date',fD(t.date)],['Load #',t.load||'—'],['Miles',t.miles?Math.round(+t.miles).toLocaleString()+' mi':'—'],['Gross',f$(+t.gross||0)],['Commission',+t.comm>0?f$(t.comm):'None'],['Broker',t.broker||'—']].forEach(r=>h+=dr(r[0],'<span class="dv">'+esc(r[1])+'</span>'));
+  h+='</div>';
+  if(t.stops&&t.stops.length){h+='<div class="card"><div class="ct">Route Stops</div>';t.stops.forEach((s,i)=>{var col=s.type==='delivery'?'var(--blu)':'var(--grn)';h+='<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:'+col+';color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</div><div><div style="font-size:10px;font-weight:700;color:'+col+';text-transform:uppercase;letter-spacing:.5px">'+s.type+'</div><div style="font-size:13px">'+esc(s.addr)+'</div>'+(s.notes?'<div style="font-size:11px;color:var(--mut)">'+esc(s.notes)+'</div>':'')+'</div></div>';});h+='</div>';}
+  if(t.mbs&&Object.keys(t.mbs).length){h+='<div class="card"><div class="ct">IFTA Mileage</div><table class="itable"><thead><tr><th>State</th><th>Miles</th><th>%</th></tr></thead><tbody>';Object.keys(t.mbs).sort((a,b)=>t.mbs[b]-t.mbs[a]).forEach(st=>{var pct=t.miles?((t.mbs[st]/+t.miles)*100).toFixed(1):'—';h+='<tr><td><span class="tag a">'+st+'</span></td><td style="font-weight:600">'+Math.round(t.mbs[st]).toLocaleString()+'</td><td style="color:var(--mut)">'+pct+'%</td></tr>';});h+='</tbody></table></div>';}
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="stitle">Trip Expenses</div><button class="btn bta bts" onclick="openExpForm(\''+t.id+'\')">+ Add</button></div>';
+  if(!te.length)h+='<p style="color:var(--mut);font-size:13px;margin-bottom:14px">No expenses linked yet.</p>';
+  te.forEach(e=>{h+='<div class="li"><div class="li-top"><span class="li-t">'+esc(e.cat)+'</span><span class="li-a cr">-'+f$(e.amount)+'</span></div><div class="li-s">'+fD(e.date)+(e.vendor?' · '+esc(e.vendor):'')+'</div></div>';});
+  if(te.length)h+='<div class="card" style="padding:10px 14px"><div class="row"><span style="font-size:13px;color:var(--mut)">Total Trip Expenses</span><span class="li-a cr">'+f$(teTot)+'</span></div></div>';
+  if(t.notes)h+='<div class="card"><div class="ct">Notes</div><div style="font-size:13px">'+esc(t.notes)+'</div></div>';
+  h+='</div>';
+  return h;
+}
+function doDeleteTrip(id){if(!confirm('Delete this trip?'))return;trips=trips.filter(t=>t.id!==id);saveAll();viewTrip=null;render();toast('Trip deleted');}
+function doEditTrip(id){editTrip=trips.find(t=>t.id===id);openTripForm();}
+
+// ── TRIP FORM ─────────────────────────────────────
+function openTripForm(){
+  var t=editTrip;
+  tstops=t?JSON.parse(JSON.stringify(t.stops||[{id:'s1',type:'pickup',addr:'',lat:0,lng:0,state:'',notes:''},{id:'s2',type:'delivery',addr:'',lat:0,lng:0,state:'',notes:''}])):[{id:uid(),type:'pickup',addr:'',lat:0,lng:0,state:'',notes:''},{id:uid(),type:'delivery',addr:'',lat:0,lng:0,state:'',notes:''}];
+  rateType=(t&&t.rateType)||'per_mile';commOn=(t&&t.commOn)||false;commType=(t&&t.commType)||'percent';
+  var h='<div class="fr"><div class="fg"><label>Date</label><input id="tf-date" type="date" value="'+(t?t.date:today())+'"/></div><div class="fg"><label>Load #</label><input id="tf-load" type="text" placeholder="Optional" value="'+(t?esc(t.load||''):'')+'"/></div></div>';
+  h+='<div class="ct" style="margin-bottom:8px">🛣 Stops</div><div id="stops-c"></div>';
+  h+='<button onclick="addStop()" style="width:100%;padding:10px;background:var(--pri-l);border:1.5px dashed var(--pri);border-radius:10px;color:var(--pri);cursor:pointer;font-size:13px;font-weight:600;margin-bottom:14px">+ Add Stop</button>';
+  h+='<div class="ct" style="margin-bottom:6px">📏 Miles</div><div style="display:flex;gap:8px;margin-bottom:14px"><input id="tf-mi" type="number" placeholder="Total miles" value="'+(t?t.miles:'')+'" oninput="updateRB()" style="flex:1"/><button onclick="calcRoute()" style="background:var(--pri);color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap">🗺 Auto</button></div>';
+  h+='<div id="ifta-p"></div>';
+  h+='<div class="ct" style="margin-bottom:6px">💰 Rate</div><div class="tg"><button id="tg-pm" class="tgb'+(rateType==='per_mile'?' on':'')+'" onclick="setRT(\'per_mile\')">Per Mile</button><button id="tg-gr" class="tgb'+(rateType==='gross'?' on':'')+'" onclick="setRT(\'gross\')">Gross Rate</button></div>';
+  h+='<div id="rate-i">'+(rateType==='per_mile'?'<div class="fg"><label>Rate per Mile ($)</label><input id="tf-rate" type="number" step="0.01" placeholder="2.50" value="'+(t?t.rate||'':'')+'" oninput="updateRB()"/></div>':'<div class="fg"><label>Gross Rate ($)</label><input id="tf-gamt" type="number" step="0.01" placeholder="3500.00" value="'+(t?t.grossAmt||'':'')+'" oninput="updateRB()"/></div>')+'</div>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="ct" style="margin-bottom:0">🤝 Commission</div><button id="comm-sw" class="sw '+(commOn?'on':'off')+'" onclick="toggleComm()"></button></div>';
+  h+='<div id="comm-a">'+(commOn?bCommF(t):'')+'</div><div id="rb"></div>';
+  h+='<div class="fg"><label>Broker</label><input id="tf-bkr" type="text" placeholder="Company name" value="'+(t?esc(t.broker||''):'')+'"/></div>';
+  h+='<div class="fg"><label>Notes</label><textarea id="tf-nts" placeholder="Optional">'+(t?esc(t.notes||''):'')+'</textarea></div>';
+  h+='<button class="btn bta" onclick="saveTrip()">Save Trip</button><button class="btn bto" onclick="closeSheet()">Cancel</button>';
+  openSheet(t?'Edit Trip':'Log New Trip',h);
+}
+function bCommF(t){return '<div class="fr"><div class="fg"><label>Type</label><select id="comm-tp" onchange="commType=this.value;updateRB()"><option value="percent"'+(commType==='percent'?' selected':'')+'>Percentage</option><option value="flat"'+(commType==='flat'?' selected':'')+'>Flat ($)</option></select></div><div class="fg"><label>'+(commType==='percent'?'%':'Amount $')+'</label><input id="comm-rt" type="number" step="0.01" placeholder="0" value="'+(t&&t.commRate?t.commRate:'')+'" oninput="updateRB()"/></div></div>';}
+function toggleComm(){commOn=!commOn;var sw=document.getElementById('comm-sw');if(sw)sw.className='sw '+(commOn?'on':'off');var ca=document.getElementById('comm-a');if(ca)ca.innerHTML=commOn?bCommF(null):'';updateRB();}
+function setRT(tp){rateType=tp;var pm=document.getElementById('tg-pm'),gr=document.getElementById('tg-gr');if(pm)pm.className='tgb'+(tp==='per_mile'?' on':'');if(gr)gr.className='tgb'+(tp==='gross'?' on':'');var ri=document.getElementById('rate-i');if(ri)ri.innerHTML=tp==='per_mile'?'<div class="fg"><label>Rate per Mile ($)</label><input id="tf-rate" type="number" step="0.01" placeholder="2.50" oninput="updateRB()"/></div>':'<div class="fg"><label>Gross Rate ($)</label><input id="tf-gamt" type="number" step="0.01" placeholder="3500.00" oninput="updateRB()"/></div>';updateRB();}
+function updateRB(){var mi=+(document.getElementById('tf-mi')||{}).value||0;var rate=rateType==='per_mile'?(+(document.getElementById('tf-rate')||{}).value||0):0;var ga=rateType==='gross'?(+(document.getElementById('tf-gamt')||{}).value||0):0;var gross=rateType==='per_mile'?mi*rate:ga;if(!gross){var rb=document.getElementById('rb');if(rb)rb.innerHTML='';return;}var cr=commOn?(+(document.getElementById('comm-rt')||{}).value||0):0;var comm=commOn?(commType==='percent'?gross*cr/100:cr):0;var ins=(+settings.insurance||0)/30;var trl=(+settings.trailer||0)/30;var net=gross-comm-ins-trl;var h='<div class="rev-box"><div class="rr"><span style="color:var(--mut)">Gross</span><span class="cg" style="font-family:var(--fh);font-size:17px;font-weight:700">'+f$(gross)+'</span></div>';if(comm>0)h+='<div class="rr"><span style="color:var(--mut)">Commission</span><span class="cr" style="font-family:var(--fh)">-'+f$(comm)+'</span></div>';if(ins>0)h+='<div class="rr"><span style="color:var(--mut)">Insurance (daily)</span><span class="cr" style="font-family:var(--fh)">-'+f$(ins)+'</span></div>';if(trl>0)h+='<div class="rr"><span style="color:var(--mut)">Trailer (daily)</span><span class="cr" style="font-family:var(--fh)">-'+f$(trl)+'</span></div>';h+='<div class="rr"><span style="font-weight:600;color:var(--txt)">Net</span><div class="rt">'+f$(net)+'</div></div></div>';var rb=document.getElementById('rb');if(rb)rb.innerHTML=h;}
+function renderStops(){var c=document.getElementById('stops-c');if(!c)return;var h='';tstops.forEach((s,i)=>{h+='<div class="stop-c"><div style="display:flex;gap:6px;align-items:center;margin-bottom:8px"><span style="font-size:12px;color:var(--mut);font-weight:600">Stop '+(i+1)+'</span><button onclick="setST(\''+s.id+'\',\'pickup\')" style="padding:3px 10px;border-radius:20px;border:1.5px solid '+(s.type==='pickup'?'var(--grn)':'var(--brd)')+';background:'+(s.type==='pickup'?'var(--grn-t)':'transparent')+';color:'+(s.type==='pickup'?'var(--grn)':'var(--mut)')+';font-size:10px;font-weight:700;cursor:pointer">PICKUP</button><button onclick="setST(\''+s.id+'\',\'delivery\')" style="padding:3px 10px;border-radius:20px;border:1.5px solid '+(s.type==='delivery'?'var(--blu)':'var(--brd)')+';background:'+(s.type==='delivery'?'var(--blu-t)':'transparent')+';color:'+(s.type==='delivery'?'var(--blu)':'var(--mut)')+';font-size:10px;font-weight:700;cursor:pointer">DELIVERY</button>'+(s.state?'<span class="tag a" style="margin-left:auto">'+esc(s.state)+'</span>':'')+(tstops.length>2?'<button onclick="rmStop(\''+s.id+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:20px;margin-left:auto">×</button>':'')+'</div>';h+='<div class="addr-wrap"><input type="text" id="ai-'+s.id+'" placeholder="'+(i===0?'Pickup':'Delivery')+' address" value="'+esc(s.addr)+'" oninput="searchAddr(\''+s.id+'\',this.value)" autocomplete="off" style="width:100%;background:var(--bg);border:1.5px solid var(--brd);border-radius:10px;padding:10px 12px;color:var(--txt);font-family:var(--fb);font-size:14px;outline:none;-webkit-appearance:none;"/><div class="addr-drop" id="ad-'+s.id+'"></div></div>';h+='<input type="text" placeholder="Stop notes" value="'+esc(s.notes||'')+'" oninput="updSN(\''+s.id+'\',this.value)" style="margin-top:8px;width:100%;background:var(--bg);border:1.5px solid var(--brd);border-radius:10px;padding:9px 12px;color:var(--txt);font-family:var(--fb);font-size:13px;outline:none;-webkit-appearance:none;"/></div>';});c.innerHTML=h;}
+function addStop(){tstops.push({id:uid(),type:'delivery',addr:'',lat:0,lng:0,state:'',notes:''});renderStops();}
+function rmStop(id){tstops=tstops.filter(s=>s.id!==id);renderStops();}
+function setST(id,tp){var s=tstops.find(s=>s.id===id);if(s)s.type=tp;renderStops();}
+function updSN(id,v){var s=tstops.find(s=>s.id===id);if(s)s.notes=v;}
+function searchAddr(sid,q){var s=tstops.find(x=>x.id===sid);if(s){s.addr=q;s.lat=0;s.lng=0;}clearTimeout(addrT[sid]);var d=document.getElementById('ad-'+sid);if(!q||q.length<3){if(d)d.className='addr-drop';return;}addrT[sid]=setTimeout(()=>{fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q)+'&format=json&countrycodes=us,ca&addressdetails=1&limit=5',{headers:{'Accept-Language':'en','User-Agent':'FreightLedger/1.0'}}).then(r=>r.json()).then(data=>{var d2=document.getElementById('ad-'+sid);if(!d2)return;if(!data.length){d2.className='addr-drop';return;}if(!window._ar)window._ar={};window._ar[sid]=data;var h='';data.forEach((item,i)=>{h+='<div class="ai" onclick="selAddr(\''+sid+'\','+i+')">📍 '+esc(item.display_name.split(',').slice(0,4).join(', '))+'</div>';});d2.innerHTML=h;d2.className='addr-drop open';}).catch(()=>{});},520);}
+function selAddr(sid,idx){var data=window._ar&&window._ar[sid];if(!data||!data[idx])return;var item=data[idx];var display=item.display_name.split(',').slice(0,3).join(', ').trim();var a=item.address||{};var stCode=SM[a.state]||(a.state_code||'').toUpperCase().slice(0,2)||'';var s=tstops.find(x=>x.id===sid);if(s){s.addr=display;s.lat=parseFloat(item.lat);s.lng=parseFloat(item.lon);s.state=stCode;}var inp=document.getElementById('ai-'+sid);if(inp)inp.value=display;var d=document.getElementById('ad-'+sid);if(d)d.className='addr-drop';renderStops();}
+function calcRoute(){var valid=tstops.filter(s=>s.lat&&s.lng);if(valid.length<2){alert('Select at least 2 addresses from the dropdown first.');return;}var miEl=document.getElementById('tf-mi');if(miEl)miEl.value='...';var p=document.getElementById('ifta-p');if(p)p.innerHTML='<div style="color:var(--mut);font-size:12px;padding:8px 0"><span class="spin"></span>Calculating...</div>';var coords=valid.map(s=>s.lng+','+s.lat).join(';');fetch('https://router.project-osrm.org/route/v1/driving/'+coords+'?overview=false').then(r=>r.json()).then(data=>{if(data.code==='Ok'&&data.routes&&data.routes[0]){var miles=Math.round(data.routes[0].distance/1000*0.621371);var m=document.getElementById('tf-mi');if(m)m.value=miles;var states=[...new Set(tstops.filter(s=>s.state).map(s=>s.state))];var mbs={};if(states.length){var ps=miles/states.length;states.forEach(st=>mbs[st]=ps);}var p2=document.getElementById('ifta-p');if(p2&&Object.keys(mbs).length){var h='<div class="card" style="margin-bottom:14px;border-color:rgba(249,115,22,.25)"><div class="ct">IFTA Auto-Estimated</div>';Object.keys(mbs).forEach(st=>{h+='<div class="row" style="margin-bottom:5px"><span class="tag a">'+st+'</span><span style="font-size:13px">'+Math.round(mbs[st])+' mi</span></div>';});h+='</div>';p2.innerHTML=h;p2.dataset.mbs=JSON.stringify(mbs);}else if(p2)p2.innerHTML='';updateRB();toast('Route: '+miles+' miles ✓');}else throw 0;}).catch(()=>{var m=document.getElementById('tf-mi');if(m&&m.value==='...')m.value='';var p2=document.getElementById('ifta-p');if(p2)p2.innerHTML='';toast('Route calculation failed. Enter miles manually.',true);});}
+function saveTrip(){var date=(document.getElementById('tf-date')||{}).value||today();var load=(document.getElementById('tf-load')||{}).value||'';var miles=+(document.getElementById('tf-mi')||{}).value||0;var rate=rateType==='per_mile'?(+(document.getElementById('tf-rate')||{}).value||0):0;var ga=rateType==='gross'?(+(document.getElementById('tf-gamt')||{}).value||0):0;var gross=rateType==='per_mile'?miles*rate:ga;var cr=commOn?(+(document.getElementById('comm-rt')||{}).value||0):0;var comm=commOn?(commType==='percent'?gross*cr/100:cr):0;var ins=(+settings.insurance||0)/30;var trl=(+settings.trailer||0)/30;var net=gross-comm-ins-trl;var broker=(document.getElementById('tf-bkr')||{}).value||'';var notes=(document.getElementById('tf-nts')||{}).value||'';var pe=document.getElementById('ifta-p');var mbs={};if(pe&&pe.dataset.mbs){try{mbs=JSON.parse(pe.dataset.mbs);}catch(e){}}if(!Object.keys(mbs).length){var states=[...new Set(tstops.filter(s=>s.state).map(s=>s.state))];if(states.length&&miles){var ps=miles/states.length;states.forEach(st=>mbs[st]=ps);}}var trip={id:editTrip?editTrip.id:uid(),date,load,miles,rateType,rate,grossAmt:ga,gross,comm,commOn,commType,commRate:cr,net,broker,notes,stops:JSON.parse(JSON.stringify(tstops)),mbs};if(editTrip)trips=trips.map(t=>t.id===trip.id?trip:t);else trips.push(trip);editTrip=null;saveAll();closeSheet();render();toast('Trip saved ✓');}
+
+// ── EXPENSES ──────────────────────────────────────
+function rExp(){
+  var ins=+settings.insurance||0,trl=+settings.trailer||0;
+  var filtered=expCat==='all'?expenses:expenses.filter(e=>e.cat===expCat);
+  var sorted=filtered.slice().sort((a,b)=>b.date>a.date?1:-1);
+  var total=filtered.reduce((s,e)=>s+(+e.amount||0),0);
+  var fuelGal=expenses.filter(e=>e.cat==='Fuel').reduce((s,e)=>s+(+e.gallons||0),0);
+  var h='<div class="fu">';
+  if(ins>0||trl>0){h+='<div class="card" style="border-color:rgba(139,92,246,.2);margin-bottom:10px"><div class="ct" style="color:var(--pur)">Recurring Costs</div>';if(ins>0)h+='<div class="row" style="margin-bottom:6px"><span style="font-size:13px">Insurance</span><span class="cr" style="font-family:var(--fh);font-size:15px;font-weight:700">'+f$(ins)+'/mo</span></div>';if(trl>0)h+='<div class="row"><span style="font-size:13px">Trailer Rental</span><span class="cr" style="font-family:var(--fh);font-size:15px;font-weight:700">'+f$(trl)+'/mo</span></div>';h+='</div>';}
+  h+='<div class="cpills">';['all',...EXP_CATS].forEach(c=>{h+='<button class="cpill'+(expCat===c?' on':'')+'" onclick="setEC(\''+c+'\')">'+(c==='all'?'All':c)+'</button>';});h+='</div>';
+  h+='<div class="card" style="padding:10px 14px;margin-bottom:10px"><div class="row"><span style="font-size:13px;color:var(--mut)">'+(expCat==='all'?'Total':expCat)+'</span><span class="li-a cr">'+f$(total)+'</span></div>';
+  if(expCat==='all'&&fuelGal>0)h+='<div class="row" style="margin-top:4px"><span style="font-size:11px;color:var(--mut)">Fuel Purchased</span><span style="font-size:12px;color:var(--pri);font-weight:600">'+fuelGal.toFixed(1)+' gal</span></div>';
+  h+='</div>';
+  if(!sorted.length)h+='<div class="empty"><div class="ei">💸</div><div class="et">No expenses here</div><p>Tap + to log one</p></div>';
+  sorted.forEach(e=>{var lk=e.tripId?trips.find(t=>t.id===e.tripId):null;h+='<div class="li"><div class="li-top"><div style="flex:1"><div class="li-t">'+esc(e.cat)+'</div><div class="li-s">'+fD(e.date)+(e.vendor?' · '+esc(e.vendor):'')+'</div>'+(e.gallons?'<div class="li-s">'+e.gallons+' gal · '+esc(e.state||'')+'</div>':'')+(lk?'<div class="li-s cb">🔗 '+esc(oName(lk))+'</div>':'')+(e.notes?'<div class="li-s">'+esc(e.notes)+'</div>':'')+'</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="li-a cr">'+f$(e.amount)+'</span><button onclick="delExp(\''+e.id+'\')" style="background:none;border:none;color:var(--mut);cursor:pointer;font-size:15px">🗑</button></div></div></div>';});
+  h+='</div><button class="fab" onclick="openExpForm()">+</button>';
+  return h;
+}
+function setEC(c){expCat=c;render();}
+function delExp(id){if(!confirm('Delete?'))return;expenses=expenses.filter(e=>e.id!==id);saveAll();render();toast('Deleted');}
+function openExpForm(tripId){
+  var h='<div class="fr"><div class="fg"><label>Date</label><input id="ef-d" type="date" value="'+today()+'"/></div><div class="fg"><label>Category</label><select id="ef-c" onchange="toggleFF(this.value)">';
+  EXP_CATS.forEach(c=>{h+='<option>'+c+'</option>';});
+  h+='</select></div></div><div class="fr"><div class="fg"><label>Amount ($)</label><input id="ef-a" type="number" step="0.01" placeholder="0.00"/></div><div class="fg" id="gf" style="display:none"><label>Gallons</label><input id="ef-g" type="number" step="0.01" placeholder="0"/></div></div><div class="fg" id="sf" style="display:none"><label>State Purchased</label><select id="ef-s">';
+  US_STATES.forEach(s=>{h+='<option>'+s+'</option>';});
+  h+='</select></div><div class="fg"><label>Vendor</label><input id="ef-v" type="text" placeholder="e.g. Pilot Flying J"/></div>';
+  if(!tripId){h+='<div class="fg"><label>Link to Trip (optional)</label><select id="ef-t"><option value="">Not linked</option>';trips.slice().sort((a,b)=>b.date>a.date?1:-1).forEach(t=>{h+='<option value="'+t.id+'">'+fD(t.date)+' – '+esc(oName(t))+'→'+esc(dName(t))+'</option>';});h+='</select></div>';}
+  h+='<div class="fg"><label>Notes</label><input id="ef-n" type="text" placeholder="Optional"/></div>';
+  h+='<button class="btn bta" onclick="saveExp(\''+(tripId||'')+'\')">Save Expense</button><button class="btn bto" onclick="closeSheet()">Cancel</button>';
+  openSheet('Add Expense',h);
+}
+function toggleFF(v){var iF=v==='Fuel';var gf=document.getElementById('gf'),sf=document.getElementById('sf');if(gf)gf.style.display=iF?'block':'none';if(sf)sf.style.display=iF?'block':'none';}
+function saveExp(tripId){var date=(document.getElementById('ef-d')||{}).value||today();var cat=(document.getElementById('ef-c')||{}).value||'Other';var amount=+(document.getElementById('ef-a')||{}).value||0;var gallons=+(document.getElementById('ef-g')||{}).value||0;var state=(document.getElementById('ef-s')||{}).value||'';var vendor=(document.getElementById('ef-v')||{}).value||'';var linked=tripId||((document.getElementById('ef-t')||{}).value||'');var notes=(document.getElementById('ef-n')||{}).value||'';if(!amount){alert('Enter amount.');return;}expenses.push({id:uid(),date,cat,amount,gallons,state,vendor,tripId:linked,notes});saveAll();closeSheet();if(viewTrip)viewTrip=trips.find(t=>t.id===viewTrip.id);render();toast('Expense saved ✓');}
+
+// ── IFTA ──────────────────────────────────────────
+function rIFTA(){
+  var sm={};trips.forEach(t=>{if(!t.mbs)return;Object.keys(t.mbs).forEach(st=>{sm[st]=(sm[st]||0)+(+t.mbs[st]||0);});});
+  var rows=Object.keys(sm).sort((a,b)=>sm[b]-sm[a]);
+  var tot=rows.reduce((s,st)=>s+sm[st],0);
+  var fbS={};expenses.filter(e=>e.cat==='Fuel').forEach(e=>{if(e.state)fbS[e.state]=(fbS[e.state]||0)+(+e.gallons||0);});
+  var totG=Object.values(fbS).reduce((s,v)=>s+v,0);
+  var mpg=totG?(tot/totG).toFixed(1):'—';
+  var qs=['Q1 (Jan–Mar)','Q2 (Apr–Jun)','Q3 (Jul–Sep)','Q4 (Oct–Dec)'];
+  var ds=['April 30','July 31','October 31','January 31'];
+  var qi=Math.floor(new Date().getMonth()/3);
+  var h='<div class="fu"><div class="card" style="border-color:rgba(249,115,22,.25)"><div class="ct">Current Quarter</div><div style="font-size:20px;font-weight:700;color:var(--pri);font-family:var(--fh)">'+qs[qi]+'</div><div style="font-size:12px;color:var(--mut);margin-top:4px">Due: '+ds[qi]+' · File with your base jurisdiction</div></div>';
+  h+='<div class="stats">'+stat('cb','States',rows.length)+stat('ca','Total Miles',Math.round(tot).toLocaleString())+stat('cg','Fuel Gal',totG.toFixed(0))+stat('cp','Avg MPG',mpg)+'</div>';
+  if(!rows.length)h+='<div class="empty"><div class="ei">🗺</div><div class="et">No IFTA data yet</div><p>Add trips with addresses to auto-calculate state miles</p></div>';
+  else{h+='<div class="card"><div class="ct">Miles by State</div><table class="itable"><thead><tr><th>State</th><th>Miles</th><th>%</th><th>Fuel Gal</th></tr></thead><tbody>';rows.forEach(st=>{var pct=tot?((sm[st]/tot)*100).toFixed(1):'0';h+='<tr><td><span class="tag a">'+st+'</span></td><td style="font-weight:600">'+Math.round(sm[st]).toLocaleString()+'</td><td style="color:var(--mut)">'+pct+'%</td><td style="color:var(--blu)">'+(fbS[st]||0).toFixed(1)+'</td></tr>';});h+='</tbody></table></div>';}
+  h+='<div class="card"><div class="ct">IFTA Checklist</div>';['Miles auto-calculated from trip routes','Track fuel gallons & state under Expenses','File quarterly with your base jurisdiction','Due dates: Apr 30 · Jul 31 · Oct 31 · Jan 31','Keep records for 4 years'].forEach(item=>{h+='<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:9px"><span style="color:var(--grn)">✓</span><span style="font-size:13px;color:var(--txt2)">'+item+'</span></div>';});
+  h+='</div></div>';return h;
+}
+
+// ── INVOICES ──────────────────────────────────────
+function rInv(){
+  var s=invoices.slice().sort((a,b)=>b.date>a.date?1:-1);
+  var h='<div class="fu">';
+  if(!s.length)h+='<div class="empty"><div class="ei">📄</div><div class="et">No invoices yet</div><p>Create one from your trips</p></div>';
+  s.forEach(inv=>{h+='<div class="li" onclick="doViewInv(\''+inv.id+'\')"><div class="li-top"><div><div class="li-t">'+esc(inv.num)+'</div><div class="li-s">'+fD(inv.date)+' · '+esc(inv.to||'—')+'</div></div><span class="li-a cg">'+f$(inv.total)+'</span></div><div class="tags"><span class="tag">'+((inv.tripIds||[]).length)+' load'+((inv.tripIds||[]).length!==1?'s':'')+'</span><span class="badge g">Created</span></div></div>';});
+  h+='</div><button class="fab" onclick="openInvForm()">+</button>';
+  return h;
+}
+function doViewInv(id){viewInv=invoices.find(i=>i.id===id);render();}
+function rInvDetail(inv){
+  var st2=trips.filter(t=>(inv.tripIds||[]).includes(t.id));
+  var h='<div class="fu"><button class="back" onclick="viewInv=null;render()">← Invoices</button>';
+  h+='<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px"><div><div class="ct">Invoice</div><div style="font-size:22px;font-weight:800;font-family:var(--fh)">'+esc(inv.num)+'</div></div><span class="badge g">CREATED</span></div>';
+  [['Date',fD(inv.date)],['Bill To',inv.to||'—'],['Email',inv.email||'—']].forEach(r=>h+=dr(r[0],'<span class="dv">'+esc(r[1])+'</span>'));
+  h+='</div>';
+  if(st2.length){h+='<div class="card"><div class="ct">Loads Included</div>';st2.forEach(t=>{h+='<div class="row" style="margin-bottom:9px"><span style="font-size:12px">'+esc(oName(t))+' → '+esc(dName(t))+' <span style="color:var(--mut)">'+fD(t.date)+'</span></span><span class="cg" style="font-family:var(--fh);font-size:14px;font-weight:700">'+f$(+t.net||+t.gross||0)+'</span></div>';});if(+inv.extra>0)h+='<div class="row" style="padding-top:8px;border-top:1px solid var(--brd)"><span style="font-size:13px">'+esc(inv.extraLabel)+'</span><span class="ca" style="font-family:var(--fh);font-size:14px;font-weight:700">'+f$(inv.extra)+'</span></div>';h+='</div>';}
+  h+='<div class="inv-total"><div class="inv-lbl">Total Due</div><div class="inv-val">'+f$(inv.total)+'</div></div>';
+  if(inv.email)h+='<a href="mailto:'+inv.email+'?subject=Invoice '+encodeURIComponent(inv.num)+'" class="btn bta" style="text-decoration:none;margin-top:14px;display:block">📧 Email Invoice</a>';
+  h+='<button class="btn btr" onclick="delInv(\''+inv.id+'\')">Delete Invoice</button></div>';
+  return h;
+}
+function delInv(id){if(!confirm('Delete?'))return;invoices=invoices.filter(i=>i.id!==id);saveAll();viewInv=null;render();toast('Deleted');}
+function openInvForm(){
+  var n='INV-'+Date.now().toString().slice(-5);
+  var h='<div class="fr"><div class="fg"><label>Invoice #</label><input id="iv-n" type="text" value="'+n+'"/></div><div class="fg"><label>Date</label><input id="iv-d" type="date" value="'+today()+'"/></div></div>';
+  h+='<div class="fg"><label>Bill To</label><input id="iv-to" type="text" placeholder="Broker or shipper"/></div><div class="fg"><label>Email</label><input id="iv-em" type="email" placeholder="billing@company.com"/></div>';
+  h+='<div class="div"></div><div class="ct">Select Trips</div>';
+  if(!trips.length)h+='<p style="color:var(--mut);font-size:13px;margin-bottom:10px">No trips yet.</p>';
+  trips.slice().sort((a,b)=>b.date>a.date?1:-1).forEach(t=>{h+='<div class="li" id="it-'+t.id+'" onclick="togIT(\''+t.id+'\')" style="margin-bottom:6px"><div class="li-top"><span class="li-t">'+esc(oName(t))+' → '+esc(dName(t))+'</span><span class="li-a cg">'+f$(+t.net||+t.gross||0)+'</span></div><div class="li-s">'+fD(t.date)+(t.miles?' · '+Math.round(+t.miles).toLocaleString()+' mi':'')+'</div></div>';});
+  h+='<div class="div"></div><div class="fr"><div class="fg"><label>Extra Fee ($)</label><input id="iv-ex" type="number" step="0.01" placeholder="0.00" oninput="updIT()"/></div><div class="fg"><label>Label</label><input id="iv-el" type="text" value="Detention"/></div></div>';
+  h+='<div class="inv-total"><div class="inv-lbl">Total</div><div class="inv-val" id="iv-tot">$0.00</div></div>';
+  h+='<button class="btn bta" style="margin-top:14px" onclick="saveInv()">Create Invoice</button><button class="btn bto" onclick="closeSheet()">Cancel</button>';
+  openSheet('Create Invoice',h);window._is=[];
+}
+function togIT(id){var s=window._is||[];var i=s.indexOf(id);if(i>-1)s.splice(i,1);else s.push(id);window._is=s;var el=document.getElementById('it-'+id);if(el)el.style.borderColor=s.includes(id)?'var(--pri)':'var(--brd)';updIT();}
+function updIT(){var s=window._is||[];var tt=trips.filter(t=>s.includes(t.id)).reduce((x,t)=>x+(+t.net||+t.gross||0),0);var ex=+(document.getElementById('iv-ex')||{}).value||0;var el=document.getElementById('iv-tot');if(el)el.textContent=f$(tt+ex);}
+function saveInv(){var n=(document.getElementById('iv-n')||{}).value||'INV';var d=(document.getElementById('iv-d')||{}).value||today();var to=(document.getElementById('iv-to')||{}).value||'';var em=(document.getElementById('iv-em')||{}).value||'';var ex=+(document.getElementById('iv-ex')||{}).value||0;var el=(document.getElementById('iv-el')||{}).value||'Extra';var s=window._is||[];var tt=trips.filter(t=>s.includes(t.id)).reduce((x,t)=>x+(+t.net||+t.gross||0),0);invoices.push({id:uid(),num:n,date:d,to,email:em,tripIds:s,extra:ex,extraLabel:el,total:tt+ex});saveAll();closeSheet();render();toast('Invoice created ✓');}
+
+// ── SETTINGS ──────────────────────────────────────
+function rSet(){
+  var tfa=auth&&auth.tfaEnabled;
+  var fbCfg=settings.fbConfig;
+  var h='<div class="fu">';
+  // Account
+  h+='<div class="card"><div class="ct">Account</div>';
+  h+='<div class="srow"><div><div class="srow-l">Email</div><div class="srow-s">'+esc(auth?auth.email:'—')+'</div></div><span class="badge g">Active</span></div>';
+  h+='<div class="srow"><div><div class="srow-l">Two-Factor Auth</div><div class="srow-s">'+(tfa?'Enabled — account protected':'Disabled — add extra security')+'</div></div>'+(tfa?'<button class="btn btr bts" style="margin-top:0;font-size:12px;padding:6px 12px" onclick="dis2FA()">Disable</button>':'<button class="btn bta bts" style="font-size:12px;padding:6px 12px" onclick="setup2FA()">Enable</button>')+'</div>';
+  h+='<button class="btn bto" style="margin-top:10px" onclick="changePwd()">Change Password</button><button class="btn btr" onclick="doLogout()">Sign Out</button></div>';
+  // Appearance
+  h+='<div class="card"><div class="ct">Appearance</div><div class="srow"><div><div class="srow-l">Dark Mode</div><div class="srow-s">Switch to dark background</div></div><button class="sw '+(settings.dark?'on':'off')+'" onclick="togDark()"></button></div></div>';
+  // Company
+  h+='<div class="card"><div class="ct">Company & Driver Info</div>';
+  [['company','Business Name','e.g. Freightage Inc'],['dba','DBA Name','Doing business as'],['driver','Driver Name','Full name'],['truck','Unit #','e.g. UNIT-01'],['mc','MC Number','MC-123456'],['dot','DOT Number','1234567'],['ein','EIN','Tax ID']].forEach(f=>{h+='<div class="fg"><label>'+f[1]+'</label><input type="text" placeholder="'+f[2]+'" value="'+esc(settings[f[0]]||'')+'" onchange="sv(\''+f[0]+'\',this.value)"/></div>';});
+  h+='</div>';
+  // Recurring costs
+  h+='<div class="card" style="border-color:rgba(139,92,246,.2)"><div class="ct" style="color:var(--pur)">Recurring Costs</div><p style="font-size:12px;color:var(--mut);margin-bottom:12px;line-height:1.5">Auto-deducted daily from trip net revenue.</p>';
+  h+='<div class="fg"><label>Insurance ($/month)</label><input type="number" step="0.01" placeholder="0.00" value="'+esc(settings.insurance||'')+'" onchange="sv(\'insurance\',this.value)"/></div>';
+  h+='<div class="fg"><label>Trailer Rental ($/month)</label><input type="number" step="0.01" placeholder="0.00" value="'+esc(settings.trailer||'')+'" onchange="sv(\'trailer\',this.value)"/></div>';
+  var daily=((+settings.insurance||0)+(+settings.trailer||0))/30;
+  if(daily>0)h+='<div style="background:var(--red-t);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--mut)">Daily deduction: <span style="color:var(--red);font-weight:600">'+f$(daily)+'/day</span></div>';
+  h+='</div>';
+  // Firebase Cloud Sync
+  h+='<div class="card" style="border-color:rgba(59,130,246,.2)"><div class="ct" style="color:var(--blu)">☁ Firebase Cloud Sync</div>';
+  h+='<p style="font-size:12px;color:var(--mut);margin-bottom:12px;line-height:1.5">Connect to Firebase for automatic real-time cloud backup across all your devices. Free tier is plenty for trucking data.</p>';
+  if(fbReady){h+='<div style="background:var(--grn-t);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--grn);font-weight:600;margin-bottom:10px">✓ Firebase Connected & Syncing</div>';}
+  h+='<div class="fg"><label>Firebase API Key</label><input type="text" id="fb-key" placeholder="AIzaSy..." value="'+esc((fbCfg&&fbCfg.apiKey)||'')+'" /></div>';
+  h+='<div class="fg"><label>Firebase Project ID</label><input type="text" id="fb-pid" placeholder="my-project-id" value="'+esc((fbCfg&&fbCfg.projectId)||'')+'" /></div>';
+  h+='<div class="fg"><label>Firebase Auth Domain</label><input type="text" id="fb-dom" placeholder="my-project.firebaseapp.com" value="'+esc((fbCfg&&fbCfg.authDomain)||'')+'" /></div>';
+  h+='<button class="btn btg bts" onclick="saveFBConfig()">Connect Firebase</button>';
+  h+='<p style="font-size:11px;color:var(--mut);margin-top:8px;line-height:1.5">Get these from Firebase Console → Project Settings → Your apps → Web app config.</p></div>';
+  // Backup
+  h+='<div class="card"><div class="ct">Local Backup</div><div style="display:flex;gap:8px;margin-bottom:8px"><button class="btn bta bts" style="flex:1" onclick="expData()">⬇ Export</button><button class="btn bto bts" style="flex:1;margin-top:0" onclick="document.getElementById(\'imp\').click()">⬆ Import</button></div><input id="imp" type="file" accept=".json" style="display:none" onchange="impData(this)"/></div>';
+  // Danger
+  h+='<div class="card" style="border-color:rgba(239,68,68,.25)"><div class="ct" style="color:var(--red)">Danger Zone</div><button class="btn btr" style="margin-top:0" onclick="resetAll()">Delete All Data</button></div></div>';
+  return h;
+}
+function sv(k,v){settings[k]=v;saveAll();updateHdr();}
+function togDark(){settings.dark=!settings.dark;saveAll();applyTheme();render();}
+function saveFBConfig(){var key=(document.getElementById('fb-key')||{}).value.trim();var pid=(document.getElementById('fb-pid')||{}).value.trim();var dom=(document.getElementById('fb-dom')||{}).value.trim();if(!key||!pid){toast('Enter API key and Project ID.',true);return;}var cfg={apiKey:key,projectId:pid,authDomain:dom||pid+'.firebaseapp.com'};settings.fbConfig=cfg;saveLocal();initFirebase(cfg);toast('Firebase connecting...');}
+function expData(){var d={trips,expenses,invoices,settings,exportDate:new Date().toISOString(),version:'3.0',app:'FreightLedger'};var b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});var u=URL.createObjectURL(b);var a=document.createElement('a');a.href=u;a.download='FreightLedger-backup-'+today()+'.json';a.click();URL.revokeObjectURL(u);toast('Backup exported ✓');}
+function impData(input){var file=input.files[0];if(!file)return;var r=new FileReader();r.onload=e=>{try{var d=JSON.parse(e.target.result);if(!confirm('Replace all data?'))return;if(d.trips)trips=d.trips;if(d.expenses)expenses=d.expenses;if(d.invoices)invoices=d.invoices;if(d.settings){var em=settings.email;settings=d.settings;settings.email=em;}saveAll();render();toast('Imported ✓');}catch(err){toast('Invalid file',true);}};r.readAsText(file);input.value='';}
+function resetAll(){if(!confirm('Delete ALL data? Cannot be undone.'))return;trips=[];expenses=[];invoices=[];saveAll();render();toast('All data cleared');}
+
+// ── 2FA ───────────────────────────────────────────
+function setup2FA(){
+  tfaSecret=genSecret();
+  var app='FreightLedger',user=auth?auth.email:'user';
+  var uri='otpauth://totp/'+encodeURIComponent(app)+':'+encodeURIComponent(user)+'?secret='+tfaSecret+'&issuer='+encodeURIComponent(app);
+  var qr='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(uri);
+  var h='<div style="text-align:center"><p style="font-size:13px;color:var(--mut);line-height:1.5;margin-bottom:14px">Scan with Google Authenticator, Authy, or Microsoft Authenticator</p><img src="'+qr+'" width="190" height="190" style="border-radius:12px;border:3px solid var(--pri)" alt="QR Code"/><p style="font-size:12px;color:var(--mut);margin:10px 0 6px">Or enter this key manually:</p><div style="background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:12px;font-family:monospace;font-size:15px;letter-spacing:2px;word-break:break-all;color:var(--txt);margin-bottom:14px">'+tfaSecret+'</div></div>';
+  h+='<div class="fg"><label>Enter 6-digit code to verify</label><input id="tv-c" type="number" placeholder="000000" style="text-align:center;font-size:24px;letter-spacing:8px;font-weight:700"/></div>';
+  h+='<button class="btn bta" onclick="confTFA()">Verify & Enable 2FA</button><button class="btn bto" onclick="closeSheet()">Cancel</button>';
+  openSheet('Set Up Two-Factor Auth',h);
+}
+async function confTFA(){var c=(document.getElementById('tv-c')||{}).value;if(!c||String(c).length<6){toast('Enter your 6-digit code',true);return;}if(!await verifyTOTP(tfaSecret,String(c))){toast('Invalid code. Try again.',true);return;}auth.tfaEnabled=true;auth.tfaSecret=tfaSecret;localStorage.setItem('fl_auth',JSON.stringify(auth));closeSheet();render();toast('2FA enabled ✓');}
+function dis2FA(){if(!confirm('Disable 2FA?'))return;auth.tfaEnabled=false;auth.tfaSecret=null;localStorage.setItem('fl_auth',JSON.stringify(auth));render();toast('2FA disabled');}
+function changePwd(){
+  var h='<div class="fg"><label>Current Password</label><input id="cp-o" type="password" placeholder="Current password"/></div><div class="fg"><label>New Password</label><input id="cp-n" type="password" placeholder="Min 8 characters"/></div><div class="fg"><label>Confirm New Password</label><input id="cp-c" type="password" placeholder="Repeat new password"/></div><div class="a-err" id="cp-e"></div>';
+  h+='<button class="btn bta" onclick="savePwd()">Update Password</button><button class="btn bto" onclick="closeSheet()">Cancel</button>';
+  openSheet('Change Password',h);
+}
+async function savePwd(){var o=(document.getElementById('cp-o')||{}).value,n=(document.getElementById('cp-n')||{}).value,c=(document.getElementById('cp-c')||{}).value;var e=document.getElementById('cp-e');var se=m=>{e.textContent=m;e.className='a-err show';};if(!o||!n||!c){se('Fill in all fields.');return;}if(await sha256(o)!==auth.pwdHash){se('Current password incorrect.');return;}if(n.length<8){se('Min 8 characters.');return;}if(n!==c){se('Passwords do not match.');return;}auth.pwdHash=await sha256(n);localStorage.setItem('fl_auth',JSON.stringify(auth));closeSheet();toast('Password updated ✓');}
+
+// ── SERVICE WORKER ────────────────────────────────
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+
+// ── BOOT ──────────────────────────────────────────
+applyTheme();
+if(sess&&sess.on&&auth){
+  document.getElementById('auth').className='hide';
+  document.getElementById('app').className='show';
+  if(settings.fbConfig)initFirebase(settings.fbConfig);
+  go('dash');
+} else {
+  showForm('f-login');
+}
+</script>
+</body>
+</html>
