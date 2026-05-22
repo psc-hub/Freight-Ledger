@@ -38,7 +38,14 @@
       "name": "Log New Trip",
       "short_name": "New Trip",
       "url": "index.html",
-      "description": "Open Freight Ledger directly to log a new trip segment"
+      "description": "Open Freight Ledger directly to log a new trip segment",
+      "icons": [
+        {
+          "src": "icon-192.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
     }
   ]
 }
