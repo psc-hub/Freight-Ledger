@@ -1,10 +1,10 @@
 const CACHE = 'freightledger-v1';
 const ASSETS = [
-  '/FreightLedger.html',
-  '/manifest.json',
-  '/icon-512.svg',
-  '/icon-192.svg',
-  '/icon-maskable.svg'
+  'index.html',
+  'manifest.json',
+  'icon-512.svg',
+  'icon-192.svg',
+  'icon-maskable.svg'
 ];
 
 self.addEventListener('install', e => {
@@ -27,7 +27,7 @@ self.addEventListener('fetch', e => {
   e.respondWith(
     caches.match(e.request)
       .then(r => r || fetch(e.request)
-        .catch(() => caches.match('/FreightLedger.html'))
+        .catch(() => caches.match('index.html'))
       )
   );
 });
