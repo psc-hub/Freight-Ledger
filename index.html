@@ -9,8 +9,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="FreightLedger"/>
 <meta name="description" content="Professional trucking management - trips, expenses, IFTA, invoices"/>
-<link rel="manifest" href="./manifest.json"/>
-<link rel="apple-touch-icon" href="./icon-512.svg"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/icon-512.svg"/>
 <title>Freight Ledger</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap');
@@ -720,7 +720,7 @@ function changePwd(){
 async function savePwd(){var o=(document.getElementById('cp-o')||{}).value,n=(document.getElementById('cp-n')||{}).value,c=(document.getElementById('cp-c')||{}).value;var e=document.getElementById('cp-e');var se=m=>{e.textContent=m;e.className='a-err show';};if(!o||!n||!c){se('Fill in all fields.');return;}if(await sha256(o)!==auth.pwdHash){se('Current password incorrect.');return;}if(n.length<8){se('Min 8 characters.');return;}if(n!==c){se('Passwords do not match.');return;}auth.pwdHash=await sha256(n);localStorage.setItem('fl_auth',JSON.stringify(auth));closeSheet();toast('Password updated ✓');}
 
 // ── SERVICE WORKER ────────────────────────────────
-if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
 
 // ── BOOT ──────────────────────────────────────────
 applyTheme();
