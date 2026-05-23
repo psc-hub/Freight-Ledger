@@ -3,37 +3,33 @@
   "name": "Freight Ledger",
   "short_name": "Freight Ledger",
   "description": "Professional trucking trip, expense, IFTA and invoice management for owner-operators",
-  "start_url": "https://psc-hub.github.io/Freight-Ledger/",
-  "scope": "/Freight-Ledger/",
+  "start_url": "index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#f97316",
   "lang": "en-US",
   "dir": "ltr",
-  "categories": [
-    "business",
-    "finance",
-    "productivity"
-  ],
+  "categories": ["business", "finance", "productivity"],
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "icon-192.svg",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-512.svg",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-maskable.svg",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ],
@@ -41,13 +37,13 @@
     {
       "name": "Log New Trip",
       "short_name": "New Trip",
-      "url": "/Freight-Ledger/index.html",
+      "url": "index.html",
       "description": "Open Freight Ledger directly to log a new trip segment",
       "icons": [
         {
-          "src": "icon-192.svg",
+          "src": "icon-192.png",
           "sizes": "192x192",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     }
