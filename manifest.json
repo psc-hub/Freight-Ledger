@@ -3,7 +3,7 @@
   "name": "Freight Ledger",
   "short_name": "Freight Ledger",
   "description": "Professional trucking trip, expense, IFTA and invoice management for owner-operators",
-  "start_url": "/Freight-Ledger/index.html",
+  "start_url": "https://psc-hub.github.io/Freight-Ledger/",
   "scope": "/Freight-Ledger/",
   "display": "standalone",
   "orientation": "portrait-primary",
@@ -11,7 +11,11 @@
   "theme_color": "#f97316",
   "lang": "en-US",
   "dir": "ltr",
-  "categories": ["business", "finance", "productivity"],
+  "categories": [
+    "business",
+    "finance",
+    "productivity"
+  ],
   "prefer_related_applications": false,
   "icons": [
     {
