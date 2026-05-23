@@ -3,8 +3,8 @@
   "name": "Freight Ledger",
   "short_name": "Freight Ledger",
   "description": "Professional trucking trip, expense, IFTA and invoice management for owner-operators",
-  "start_url": "index.html",
-  "scope": "./",
+  "start_url": "/Freight-Ledger/index.html",
+  "scope": "/Freight-Ledger/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#ffffff",
@@ -37,7 +37,7 @@
     {
       "name": "Log New Trip",
       "short_name": "New Trip",
-      "url": "index.html",
+      "url": "/Freight-Ledger/index.html",
       "description": "Open Freight Ledger directly to log a new trip segment",
       "icons": [
         {
